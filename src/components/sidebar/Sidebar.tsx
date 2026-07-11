@@ -117,7 +117,7 @@ export default function Sidebar() {
                         <p className="text-sm text-[#A3A3A3]">Couldn't load this organization.</p>
                         <button
                             type="button"
-                            onClick={refresh}
+                            onClick={() => refresh()}
                             className="mt-2 text-sm text-[#3B82F6] hover:underline"
                         >
                             Retry

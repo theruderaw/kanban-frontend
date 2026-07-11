@@ -24,7 +24,9 @@ export default function General({ project, orgSlug, onSaved }: GeneralProps) {
         if (!isDirty || !isValid) return;
 
         try {
-            await update(orgSlug, project.slug, {
+            await update({
+                orgSlug,
+                projSlug: project.slug,
                 payload: {
                     name: name.trim(),
                     description: description.trim(),

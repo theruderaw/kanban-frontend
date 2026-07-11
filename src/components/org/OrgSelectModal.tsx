@@ -12,7 +12,7 @@ export default function OrgSelectModal({
     open,
     onClose,
 }: Props) {
-    const { data, loading, error } = useDashboard();
+    const { data, isLoading, error } = useDashboard();
     const { setOrgSlug } = useOrg();
 
     const navigate = useNavigate();
@@ -67,7 +67,7 @@ export default function OrgSelectModal({
                 </p>
 
 
-                {loading && (
+                {isLoading && (
                     <p className="text-neutral-400">
                         Loading organizations...
                     </p>
@@ -76,12 +76,12 @@ export default function OrgSelectModal({
 
                 {error && (
                     <p className="text-red-400">
-                        {error}
+                        {error.message}
                     </p>
                 )}
 
 
-                {!loading && !error && (
+                {!isLoading && !error && (
                     <div className="space-y-2">
                         {data?.organizations?.map((item) => (
                             <button
