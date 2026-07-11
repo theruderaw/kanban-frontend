@@ -1,10 +1,10 @@
 // hooks/useOrgRoles.ts
 import { useState, useEffect, useCallback } from "react";
 import { getRoles, getPerms, createRole,updateRole, deleteRole } from "../api/org-roles.api";
-import type { Role } from "../types/role";
+import type { OrgRole } from "../types/org-role";
 
 interface UseOrgRolesResult {
-  roles: Role[];
+  roles: OrgRole[];
   permissions: string[];
   loading: boolean;
   error: string | null;
@@ -15,7 +15,7 @@ interface UseOrgRolesResult {
 }
 
 export function useOrgRoles(orgSlug: string | undefined): UseOrgRolesResult {
-  const [roles, setRoles] = useState<Role[]>([]);
+  const [roles, setRoles] = useState<OrgRole[]>([]);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

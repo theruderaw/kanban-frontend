@@ -1,7 +1,7 @@
 import type { User } from "./user";
-import type { Role } from "./role";
+import type { OrgRole } from "./org-role";
 
 export interface Member {
     userId: User;
-    orgRoleId: Role;
+    orgRoleId: OrgRole;
 }

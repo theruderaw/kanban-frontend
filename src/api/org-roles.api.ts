@@ -1,7 +1,7 @@
 import { api } from "./axios";
-import type { Role } from "../types/role";
+import type { OrgRole } from "../types/org-role";
 
-export async function getRoles(orgSlug: string): Promise<Role[]> {
+export async function getRoles(orgSlug: string): Promise<OrgRole[]> {
     const response = await api.get(`org/${orgSlug}/roles`);
     return response.data.roles; // matching your endpoint spec payload structures
 }

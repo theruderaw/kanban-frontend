@@ -6,3 +6,14 @@ export interface Board {
   projectId: string;
   ownedBy: string;
 }
+
+export interface CreateBoardPayload {
+  name: string;
+  description?: string;
+}
+
+export interface UpdateBoardPayload {
+  name?: string;
+  description?: string;
+  archived?: boolean;
+}

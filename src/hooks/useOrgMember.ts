@@ -9,37 +9,38 @@ import {
 
 import type { Member } from "../types/org-member";
 
-interface UseOrgMembersResult {
+interface UseProjMembersResult {
     members: Member[];
     loading: boolean;
     error: string | null;
 
     refetch: () => Promise<void>;
 
-    inviteOrgMember: (
+    inviteProjMember: (
         username: string,
         roleName: string
     ) => Promise<boolean>;
 
-    updateOrgMember: (
+    updateProjMember: (
         username: string,
         roleName: string
     ) => Promise<boolean>;
 
-    deleteOrgMember: (
+    deleteProjMember: (
         username: string
     ) => Promise<boolean>;
 }
 
 export function useOrgMembers(
-    orgSlug: string | undefined
-): UseOrgMembersResult {
+    orgSlug: string | undefined,
+    projSlug: string | undefined
+): UseProjMembersResult {
     const [members, setMembers] = useState<Member[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const fetchMembers = useCallback(async () => {
-        if (!orgSlug) return;
+        if (!orgSlug || !projSlug) return;
 
         setLoading(true);
         setError(null);
@@ -56,15 +57,15 @@ export function useOrgMembers(
         } finally {
             setLoading(false);
         }
-    }, [orgSlug]);
+    }, [orgSlug, projSlug]);
 
     useEffect(() => {
         void fetchMembers();
     }, [fetchMembers]);
 
-    const inviteOrgMember = useCallback(
+    const inviteProjMember = useCallback(
         async (username: string, roleName: string) => {
-            if (!orgSlug) return false;
+            if (!orgSlug || !projSlug) return false;
 
             setLoading(true);
             setError(null);
@@ -84,12 +85,12 @@ export function useOrgMembers(
                 setLoading(false);
             }
         },
-        [orgSlug, fetchMembers]
+        [orgSlug, projSlug, fetchMembers]
     );
 
-    const updateOrgMember = useCallback(
+    const updateProjMember = useCallback(
         async (username: string, roleName: string) => {
-            if (!orgSlug) return false;
+            if (!orgSlug || !projSlug) return false;
 
             setLoading(true);
             setError(null);
@@ -109,12 +110,12 @@ export function useOrgMembers(
                 setLoading(false);
             }
         },
-        [orgSlug, fetchMembers]
+        [orgSlug, projSlug, fetchMembers]
     );
 
-    const deleteOrgMember = useCallback(
+    const deleteProjMember = useCallback(
         async (username: string) => {
-            if (!orgSlug) return false;
+            if (!orgSlug || !projSlug) return false;
 
             setLoading(true);
             setError(null);
@@ -134,7 +135,7 @@ export function useOrgMembers(
                 setLoading(false);
             }
         },
-        [orgSlug, fetchMembers]
+        [orgSlug, projSlug, fetchMembers]
     );
 
     return {
@@ -142,8 +143,8 @@ export function useOrgMembers(
         loading,
         error,
         refetch: fetchMembers,
-        inviteOrgMember,
-        updateOrgMember,
-        deleteOrgMember
+        inviteProjMember,
+        updateProjMember,
+        deleteProjMember
     };
 }
