@@ -1,14 +1,9 @@
-import { useContext } from "react";
-import { OrgContext } from "../context/org/OrgContext";
+import { useOrgStore } from "../store/orgStore";
 
+/**
+ * Convenience hook — matches the old useOrg() API so callsites don't change.
+ * Returns { orgSlug, setOrgSlug, clearOrg }.
+ */
 export function useOrg() {
-    const context = useContext(OrgContext);
-
-    if (!context) {
-        throw new Error(
-            "useOrg must be used inside OrgProvider"
-        );
-    }
-
-    return context;
+    return useOrgStore();
 }

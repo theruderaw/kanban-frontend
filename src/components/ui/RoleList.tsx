@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useProjRoles } from "../../hooks/useProjRoles";
+import { useGetProjRoles } from "../../hooks/proj-roles/useGetRoles";
 
 interface Props {
     orgSlug: string | null;
@@ -16,7 +16,7 @@ export default function RoleList({
     onChange,
     placeholder = "Select role…",
 }: Props) {
-    const { roles, loading } = useProjRoles(orgSlug, projSlug);
+    const { data: roles = [], isFetching: loading } = useGetProjRoles(orgSlug, projSlug);
 
     const [open, setOpen] = useState(false);
 

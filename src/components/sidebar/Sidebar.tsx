@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useDashboard } from "../../hooks/useDashboard";
-import { useProjects } from "../../hooks/useProjects";
-import { useBoard } from "../../hooks/useBoard";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUpdateProject } from "../../hooks/project/useUpdate";
+import { useCreateBoard } from "../../hooks/board/useCreate";
+import { useUpdateBoard } from "../../hooks/board/useUpdate";
+import { useDeleteBoard } from "../../hooks/board/useDelete";
 import { useOrg } from "../../hooks/useOrg";
 import type { OrganizationWithProjects, ProjectWithBoards } from "../../types/dashboard";
 import type { Board } from "../../types/board";
@@ -10,9 +13,15 @@ import ProjectSettingsModal from "./settings/ProjSettingsModal";
 
 export default function Sidebar() {
     const { orgSlug } = useOrg();
-    const { data, loading, error, refresh } = useDashboard();
-    const { update } = useProjects();
-    const { create: createBoard, update: updateBoard, del: deleteBoard } = useBoard();
+    const queryClient = useQueryClient();
+    const { data, isLoading: loading, error, refetch: refresh } = useDashboard();
+    
+    const { mutateAsync: updateProject } = useUpdateProject();
+    const { mutateAsync: createBoard } = useCreateBoard();
+    const { mutateAsync: updateBoard } = useUpdateBoard();
+    const { mutateAsync: deleteBoard } = useDeleteBoard();
+
+    const invalidateDashboard = () => queryClient.invalidateQueries({ queryKey: ["dashboard"] });
 
     const [settingsProject, setSettingsProject] = useState<ProjectWithBoards | null>(null);
 
@@ -45,8 +54,8 @@ export default function Sidebar() {
         if (!orgSlug) return;
 
         try {
-            await update(orgSlug, project.slug, { name: newName });
-            refresh();
+            await updateProject({ orgSlug, projSlug: project.slug, payload: { name: newName } });
+            await invalidateDashboard();
         } catch {
             // error is already captured by useProjects; nothing further to do here
         }
@@ -58,8 +67,8 @@ export default function Sidebar() {
 
     const handleBoardCreate = async (project: ProjectWithBoards, name: string) => {
         try {
-            await createBoard(project.slug, { name });
-            refresh();
+            await createBoard({ projSlug: project.slug, payload: { name } });
+            await invalidateDashboard();
         } catch {
             // error is already captured by useBoards; nothing further to do here
         }
@@ -67,8 +76,8 @@ export default function Sidebar() {
 
     const handleBoardRename = async (board: Board, projectSlug: string, newName: string) => {
         try {
-            await updateBoard(projectSlug, board.slug, { name: newName });
-            refresh();
+            await updateBoard({ projSlug: projectSlug, boardSlug: board.slug, payload: { name: newName } });
+            await invalidateDashboard();
         } catch {
             // error is already captured by useBoards; nothing further to do here
         }
@@ -76,8 +85,8 @@ export default function Sidebar() {
 
     const handleBoardDelete = async (board: Board, projectSlug: string) => {
         try {
-            await deleteBoard(projectSlug, board.slug);
-            refresh();
+            await deleteBoard({ projSlug: projectSlug, boardSlug: board.slug });
+            await invalidateDashboard();
         } catch {
             // error is already captured by useBoards; nothing further to do here
         }

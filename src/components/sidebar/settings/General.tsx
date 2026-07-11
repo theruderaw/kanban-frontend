@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useProjects } from "../../../hooks/useProjects";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUpdateProject } from "../../../hooks/project/useUpdate";
 import type { ProjectWithBoards } from "../../../types/dashboard";
 
 interface GeneralProps {
@@ -9,7 +10,8 @@ interface GeneralProps {
 }
 
 export default function General({ project, orgSlug, onSaved }: GeneralProps) {
-    const { update, loading, error } = useProjects();
+    const queryClient = useQueryClient();
+    const { mutateAsync: update, isPending: loading, error } = useUpdateProject();
 
     const [name, setName] = useState(project.name);
     const [description, setDescription] = useState(project.description ?? "");
@@ -23,9 +25,12 @@ export default function General({ project, orgSlug, onSaved }: GeneralProps) {
 
         try {
             await update(orgSlug, project.slug, {
-                name: name.trim(),
-                description: description.trim(),
+                payload: {
+                    name: name.trim(),
+                    description: description.trim(),
+                },
             });
+            await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
             onSaved?.();
         } catch {
             // error is already captured by useProjects and shown below
@@ -62,7 +67,7 @@ export default function General({ project, orgSlug, onSaved }: GeneralProps) {
                 />
             </div>
 
-            {error && <p className="text-xs text-red-400">{error}</p>}
+            {error && <p className="text-xs text-red-400">{error.message || "Failed to update project"}</p>}
 
             <div className="flex items-center gap-2 pt-1">
                 <button

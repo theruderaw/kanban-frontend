@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 
-import { useProjects } from "../../../hooks/useProjects";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDeleteProject } from "../../../hooks/project/useDelete";
 
 import type { ProjectWithBoards } from "../../../types/dashboard";
 
@@ -16,7 +17,8 @@ export default function DangerZone({
     orgSlug,
     onDeleted,
 }: Props) {
-    const { del, loading, error } = useProjects();
+    const queryClient = useQueryClient();
+    const { mutateAsync: del, isPending: loading, error } = useDeleteProject();
 
     const [confirmSlug, setConfirmSlug] = useState("");
 
@@ -25,10 +27,12 @@ export default function DangerZone({
     async function handleDelete() {
         if (!canDelete || loading) return;
 
-        const ok = await del(orgSlug, project.slug);
-
-        if (ok) {
+        try {
+            await del({ orgSlug, projSlug: project.slug });
+            await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
             onDeleted?.();
+        } catch {
+            // error is handled by error state
         }
     }
 
@@ -65,7 +69,7 @@ export default function DangerZone({
 
             {error && (
                 <p className="text-sm text-red-400">
-                    {error}
+                    {error.message || "Failed to delete project"}
                 </p>
             )}
 
